@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
-import Perfil from './src/screens/perfil';   
+import Imagen from './src/screens/Imagen';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Perfil />     
+      <Imagen />     
       <StatusBar style="light" />
     </View>
   );
