@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const Imagen = ({ navigation }) => {
@@ -25,6 +25,10 @@ const Imagen = ({ navigation }) => {
             id: p.id,
             nombre: p.name,
             imagen: p.image,
+            estado: p.status,
+            especie: p.species,
+            genero: p.gender,
+            origen: p.origin.name,
         }));
 
         setPersonajes(filtrados);
@@ -38,7 +42,15 @@ const Imagen = ({ navigation }) => {
     const renderItem = ({ item }) => (
     <View style={styles.card}>
         <Image source={{ uri: item.imagen }} style={styles.image} />
-        <Text style={styles.name}>{item.nombre}</Text>
+        <View style={styles.info}>
+            <Text style={styles.name}>{item.nombre}</Text>
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate('Detalle', { personaje: item })}
+            >
+                <Text style={styles.buttonText}>Ver Detalle</Text>
+            </TouchableOpacity>
+        </View>
     </View>
     );
 
@@ -101,12 +113,28 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#fff',
     },
+    info: {
+    flex: 1,
+    marginLeft: 16,
+    },
     name: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
-    marginLeft: 16,
     flexShrink: 1,           // evita desbordar nombres largos
+    marginBottom: 8,
+    },
+    button: {
+    backgroundColor: '#00b4d8',
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+    },
+    buttonText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: 'bold',
     },
     loadingText: { color: '#fff', marginTop: 12, fontSize: 14 },
     errorText: { color: '#fff', fontSize: 16, textAlign: 'center' },
