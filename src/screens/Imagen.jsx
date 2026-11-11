@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const Imagen = () => {
+const Imagen = ({ navigation }) => {
     const [personajes, setPersonajes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

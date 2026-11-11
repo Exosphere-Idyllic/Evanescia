@@ -1,14 +1,11 @@
-import { StatusBar } from 'expo-status-bar';
+import { NavigationContainer } from '@react-navigation/native';
 import { StyleSheet, View } from 'react-native';
-import Imagen from './src/screens/Imagen';
+import AppNavigator from './src/navigation/AppNavigator';
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Imagen />     
-      <StatusBar style="light" />
-    </View>
-  );
+  return <NavigationContainer>
+    <AppNavigator />
+  </NavigationContainer>;
 }
 
 const styles = StyleSheet.create({

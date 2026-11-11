@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {View,Text,Image,TouchableOpacity,TextInput,StyleSheet,ScrollView } from 'react-native';
 
-const Perfil = () => {
+const Perfil = ({ navigation }) => {
     const [perfil, setPerfil] = useState({
     nombre: 'Pablo Aguilar',
     edad: '20',
