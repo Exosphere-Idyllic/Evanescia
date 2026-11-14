@@ -1,152 +1,142 @@
 import { useState } from 'react';
-import {View,Text,Image,TouchableOpacity,TextInput,StyleSheet,ScrollView } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import BotonShare from '../components/BotonShare';
-import { useNavigation } from '@react-navigation/native';
 
 const Perfil = ({ navigation }) => {
     const [perfil, setPerfil] = useState({
-    nombre: 'Pablo Aguilar',
-    edad: '20',
-    ciudad: 'Cuenca',
-    profesion: 'Desarrollador de software',
+        nombre: 'Pablo Aguilar',
+        edad: '20',
+        ciudad: 'Cuenca',
+        profesion: 'Desarrollador de software',
+        imagen: 'https://animota.net/cdn/shop/files/00095421535_03.jpg?v=1692950795&width=1445',
     });
 
-    const [editMode, setEditMode] = useState(false);
-    const [draft, setDraft] = useState(perfil);
-
-    const toggleEdit = () => {
-    if (editMode) {
-        setPerfil(draft); 
-    } else {
-        setDraft(perfil); 
-    }
-    setEditMode(!editMode);
+    const irAEditarPerfil = () => {
+        navigation.navigate('EditarPerfil', {
+            perfil,
+            onSave: (nuevoPerfil) => {
+                setPerfil(nuevoPerfil);
+            },
+        });
     };
 
-const renderField = (label, key) =>
-    editMode ? (
-        <View style={styles.fieldRow}>
-        <Text style={styles.label}>{label}</Text>
-        <TextInput
-            style={styles.input}
-            value={draft[key]}
-            onChangeText={(txt) => setDraft({ ...draft, [key]: txt })}
-            placeholderTextColor="#7C7B75"
-        />
-        </View>
-    ) : (
+    const renderField = (label, valor) => (
         <Text style={styles.info}>
-        <Text style={styles.label}>{label}: </Text>
-        {perfil[key]}
+            <Text style={styles.label}>{label}: </Text>
+            {valor}
         </Text>
     );
 
     return (
-    <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.card}>
-        <Image
-            source={{
-            uri: 'https://animota.net/cdn/shop/files/00095421535_03.jpg?v=1692950795&width=1445',
-            }}
-            style={styles.avatar}
-        />
+        <ScrollView contentContainerStyle={styles.container}>
+            <View style={styles.card}>
+                {perfil.imagen ? (
+                    <Image
+                        source={{ uri: perfil.imagen }}
+                        style={styles.avatar}
+                    />
+                ) : (
+                    <View style={styles.avatarPlaceholder}>
+                        <Text style={styles.avatarPlaceholderText}>Sin Foto</Text>
+                    </View>
+                )}
 
-        <View style={styles.infoCard}>
-            {renderField('Nombre', 'nombre')}
-            {renderField('Edad', 'edad')}
-            {renderField('Ciudad', 'ciudad')}
-            {renderField('Profesión', 'profesion')}
-        </View>
+                <View style={styles.infoCard}>
+                    {renderField('Nombre', perfil.nombre)}
+                    {renderField('Edad', perfil.edad)}
+                    {renderField('Ciudad', perfil.ciudad)}
+                    {renderField('Profesión', perfil.profesion)}
+                </View>
 
-        <TouchableOpacity style={styles.changeButton} onPress={toggleEdit}>
-            <Text style={styles.buttonText}>
-            {editMode ? 'Guardar cambios' : 'Editar perfil'}
-            </Text>
-        </TouchableOpacity>
-        <BotonShare datos={perfil} titulo="Perfil de usuario" />
-        </View>
-    </ScrollView>
+                <TouchableOpacity style={styles.changeButton} onPress={irAEditarPerfil}>
+                    <Text style={styles.buttonText}>Editar perfil</Text>
+                </TouchableOpacity>
+                <BotonShare datos={perfil} titulo="Perfil de usuario" />
+            </View>
+        </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-    flexGrow: 1,
-    backgroundColor: '#FAF9F8',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
+        flexGrow: 1,
+        backgroundColor: '#FAF9F8',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 24,
     },
     card: {
-    backgroundColor: '#FAF9F8',
-    borderRadius: 18,
-    padding: 24,
-    alignItems: 'center',
-    width: '100%',
-    maxWidth: 360,
-    borderWidth: 1,
-    borderColor: '#7C7B75',
-    shadowColor: '#232A4D',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 3,
+        backgroundColor: '#FAF9F8',
+        borderRadius: 18,
+        padding: 24,
+        alignItems: 'center',
+        width: '100%',
+        maxWidth: 360,
+        borderWidth: 1,
+        borderColor: '#7C7B75',
+        shadowColor: '#232A4D',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 10,
+        elevation: 3,
     },
     avatar: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    marginBottom: 22,
-    borderColor: '#795772',
-    borderWidth: 2,
+        width: 110,
+        height: 110,
+        borderRadius: 55,
+        marginBottom: 22,
+        borderColor: '#795772',
+        borderWidth: 2,
+    },
+    avatarPlaceholder: {
+        width: 110,
+        height: 110,
+        borderRadius: 55,
+        marginBottom: 22,
+        borderColor: '#795772',
+        borderWidth: 2,
+        backgroundColor: '#E5E7EB',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    avatarPlaceholderText: {
+        color: '#6B7280',
+        fontWeight: '600',
+        fontSize: 14,
     },
     infoCard: {
-    width: '100%',
-    backgroundColor: '#9294AF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 8,
+        width: '100%',
+        backgroundColor: '#9294AF',
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 8,
     },
     info: {
-    fontSize: 15,
-    color: '#232A4D',
-    fontWeight: '500',
-    marginBottom: 8,
+        fontSize: 15,
+        color: '#232A4D',
+        fontWeight: '500',
+        marginBottom: 8,
     },
     label: {
-    fontWeight: '700',
-    color: '#232A4D',
-    fontSize: 13,
-    marginBottom: 4,
-    letterSpacing: 0.3,
-    },
-    fieldRow: {
-    width: '100%',
-    marginBottom: 10,
-    },
-    input: {
-    backgroundColor: '#FAF9F8',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    fontSize: 15,
-    color: '#232A4D',
-    borderWidth: 1,
-    borderColor: '#7C7B75',
+        fontWeight: '700',
+        color: '#232A4D',
+        fontSize: 13,
+        marginBottom: 4,
+        letterSpacing: 0.3,
     },
     changeButton: {
-    backgroundColor: '#795772',
-    borderRadius: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    marginTop: 20,
+        backgroundColor: '#795772',
+        borderRadius: 10,
+        paddingVertical: 12,
+        paddingHorizontal: 32,
+        marginTop: 20,
     },
     buttonText: {
-    color: '#FAF9F8',
-    fontWeight: '600',
-    fontSize: 15,
-    letterSpacing: 0.4,
-},
+        color: '#FAF9F8',
+        fontWeight: '600',
+        fontSize: 15,
+        letterSpacing: 0.4,
+    },
 });
 
 export default Perfil;

@@ -8,36 +8,45 @@ const Imagen = ({ navigation }) => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-    fetchImages();
-    }, []); 
+        let isMounted = true;
 
-    const fetchImages = async () => {
-    try {
-        setLoading(true);
-        setError(null);
+        const load = async () => {
+            try {
+                setError(null);
+                const response = await fetch('https://rickandmortyapi.com/api/character');
+                if (!response.ok) throw new Error('No se pudo obtener la lista');
 
-        const response = await fetch('https://rickandmortyapi.com/api/character');
-            if (!response.ok) throw new Error('No se pudo obtener la lista');
+                const data = await response.json();
+                const filtrados = data.results.map((p) => ({
+                    id: p.id,
+                    nombre: p.name,
+                    imagen: p.image,
+                    estado: p.status,
+                    especie: p.species,
+                    genero: p.gender,
+                    origen: p.origin.name,
+                }));
 
-        const data = await response.json();
+                if (isMounted) {
+                    setPersonajes(filtrados);
+                }
+            } catch (err) {
+                if (isMounted) {
+                    setError(err.message);
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
 
-        const filtrados = data.results.map((p) => ({
-            id: p.id,
-            nombre: p.name,
-            imagen: p.image,
-            estado: p.status,
-            especie: p.species,
-            genero: p.gender,
-            origen: p.origin.name,
-        }));
+        load();
 
-        setPersonajes(filtrados);
-        } catch (err) {
-        setError(err.message);
-    } finally {
-        setLoading(false);
-    }
-    };
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const renderItem = ({ item }) => (
     <View style={styles.card}>
