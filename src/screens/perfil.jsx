@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import {View,Text,Image,TouchableOpacity,TextInput,StyleSheet,ScrollView } from 'react-native';
+import BotonShare from '../components/BotonShare';
+import { useNavigation } from '@react-navigation/native';
 
 const Perfil = ({ navigation }) => {
     const [perfil, setPerfil] = useState({
@@ -61,6 +63,7 @@ const renderField = (label, key) =>
             {editMode ? 'Guardar cambios' : 'Editar perfil'}
             </Text>
         </TouchableOpacity>
+        <BotonShare datos={perfil} titulo="Perfil de usuario" />
         </View>
     </ScrollView>
     );
