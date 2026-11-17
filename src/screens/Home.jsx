@@ -15,6 +15,11 @@ const Home = ({ navigation }) => {
         title="Ir a Caja"
         onPress={() => navigation.navigate('Caja')}
         />
+        <Button
+        title="🎯 Ir al Quiz (Trivia)"
+        color="#4f46e5"
+        onPress={() => navigation.navigate('Quiz')}
+        />
     </View>
     );
 };
