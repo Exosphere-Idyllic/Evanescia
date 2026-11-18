@@ -6,6 +6,8 @@ import Imagen from '../screens/Imagen';
 import Caja from '../screens/Caja';
 import Detalle from '../screens/Detalle';
 import QuizScreen from '../screens/QuizScreen';
+import Productos from '../screens/Productos';
+import DetalleProducto from '../screens/DetalleProducto';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +22,8 @@ const AppNavigator = () => {
             <Stack.Screen name="Caja" component={Caja} options={{ title: 'Caja' }} />
             <Stack.Screen name="Detalle" component={Detalle} options={{ title: 'Detalle del Personaje' }} />
             <Stack.Screen name="Quiz" component={QuizScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="Productos" component={Productos} options={{ title: 'Catálogo de Productos' }} />
+            <Stack.Screen name="DetalleProducto" component={DetalleProducto} options={{ title: 'Detalle del Producto' }} />
         </Stack.Navigator>
     );
 };

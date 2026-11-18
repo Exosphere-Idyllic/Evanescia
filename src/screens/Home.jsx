@@ -20,6 +20,11 @@ const Home = ({ navigation }) => {
         color="#4f46e5"
         onPress={() => navigation.navigate('Quiz')}
         />
+        <Button
+        title="🛍️ Ver Productos (FakeStore)"
+        color="#059669"
+        onPress={() => navigation.navigate('Productos')}
+        />
     </View>
     );
 };
