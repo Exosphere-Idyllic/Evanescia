@@ -1,84 +1,151 @@
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import {
+  HeartPulse,
+  Dna,
+  Users,
+  Globe,
+  ArrowLeft,
+} from 'lucide-react-native';
+import { GradientBackground } from '../components/ui/GradientBackground';
+import { GlassCard } from '../components/ui/GlassCard';
+import { Avatar } from '../components/ui/Avatar';
+import { Badge } from '../components/ui/Badge';
+import { Button } from '../components/ui/Button';
+import { Divider } from '../components/ui/Divider';
+import { colors } from '../theme/colors';
+import { spacing } from '../theme/spacing';
+import { typography } from '../theme/typography';
+import { gradients } from '../theme/gradients';
 
-const Detalle = ({ route }) => {
-    // Los datos del personaje llegan como parámetro de navegación
-    const { personaje } = route.params;
+const Detalle = ({ route, navigation }) => {
+  const { personaje } = route.params;
 
-    return (
-        <LinearGradient colors={['#4c669f', '#3b5998', '#192f6a']} style={styles.container}>
-            <ScrollView contentContainerStyle={styles.content}>
-                <Image source={{ uri: personaje.imagen }} style={styles.image} />
+  const getStatusVariant = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'alive':
+        return 'success';
+      case 'dead':
+        return 'danger';
+      default:
+        return 'default';
+    }
+  };
 
-                <Text style={styles.nombre}>{personaje.nombre}</Text>
+  const renderFila = (IconComponent, etiqueta, valor) => (
+    <View style={styles.fila}>
+      <View style={styles.filaLabelContainer}>
+        <IconComponent size={16} color={colors.accent.info} style={styles.filaIcon} />
+        <Text style={styles.etiqueta}>{etiqueta}</Text>
+      </View>
+      <Text style={styles.valor}>{valor || 'Desconocido'}</Text>
+    </View>
+  );
 
-                <View style={styles.card}>
-                    <Fila etiqueta="Estado" valor={personaje.estado} />
-                    <Fila etiqueta="Especie" valor={personaje.especie} />
-                    <Fila etiqueta="Género" valor={personaje.genero} />
-                    <Fila etiqueta="Origen" valor={personaje.origen} />
-                </View>
-            </ScrollView>
-        </LinearGradient>
-    );
+  return (
+    <GradientBackground colors={gradients.water}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <GlassCard variant="elevated" style={styles.mainCard} glow glowColor={colors.accent.info}>
+          {/* Avatar grande */}
+          <Avatar
+            uri={personaje.imagen}
+            size={160}
+            borderColor={colors.accent.info}
+            glow
+          />
+
+          <Text style={styles.nombre}>{personaje.nombre}</Text>
+
+          <Badge
+            text={personaje.estado}
+            variant={getStatusVariant(personaje.estado)}
+            style={styles.statusBadge}
+          />
+
+          <Divider style={styles.divider} />
+
+          {/* Ficha técnica del personaje */}
+          <View style={styles.detallesList}>
+            {renderFila(HeartPulse, 'Estado vital', personaje.estado)}
+            {renderFila(Dna, 'Especie', personaje.especie)}
+            {renderFila(Users, 'Género', personaje.genero)}
+            {renderFila(Globe, 'Planeta de Origen', personaje.origen)}
+          </View>
+
+          <Button
+            title="Volver a la Galería"
+            onPress={() => navigation.goBack()}
+            variant="glass"
+            icon={ArrowLeft}
+            fullWidth
+            style={styles.backButton}
+          />
+        </GlassCard>
+      </ScrollView>
+    </GradientBackground>
+  );
 };
 
-// Componente auxiliar para cada fila de dato
-const Fila = ({ etiqueta, valor }) => (
-    <View style={styles.fila}>
-        <Text style={styles.etiqueta}>{etiqueta}:</Text>
-        <Text style={styles.valor}>{valor}</Text>
-    </View>
-);
-
 const styles = StyleSheet.create({
-    container: { flex: 1 },
-    content: {
-        alignItems: 'center',
-        padding: 24,
-    },
-    image: {
-        width: 160,
-        height: 160,
-        borderRadius: 80,
-        borderWidth: 3,
-        borderColor: '#fff',
-        marginBottom: 20,
-        marginTop: 16,
-    },
-    nombre: {
-        color: '#fff',
-        fontSize: 26,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 24,
-    },
-    card: {
-        width: '100%',
-        backgroundColor: 'rgba(255, 255, 255, 0.12)',
-        borderRadius: 16,
-        padding: 16,
-        gap: 12,
-    },
-    fila: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255,255,255,0.15)',
-        paddingBottom: 10,
-    },
-    etiqueta: {
-        color: '#90e0ef',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    valor: {
-        color: '#fff',
-        fontSize: 16,
-        flexShrink: 1,
-        textAlign: 'right',
-        marginLeft: 8,
-    },
+  content: {
+    alignItems: 'center',
+    padding: spacing.xl,
+    paddingVertical: spacing.xxxl,
+  },
+  mainCard: {
+    width: '100%',
+    maxWidth: 380,
+    alignItems: 'center',
+    padding: spacing.xl,
+  },
+  nombre: {
+    ...typography.h1,
+    color: colors.text.primary,
+    textAlign: 'center',
+    marginTop: spacing.md,
+  },
+  statusBadge: {
+    marginTop: spacing.xs,
+  },
+  divider: {
+    marginVertical: spacing.lg,
+  },
+  detallesList: {
+    width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderRadius: 14,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.glass.borderLight,
+    gap: spacing.md,
+  },
+  fila: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  filaLabelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  filaIcon: {
+    marginRight: spacing.sm,
+  },
+  etiqueta: {
+    ...typography.bodySmall,
+    color: colors.text.secondary,
+  },
+  valor: {
+    ...typography.bodySmall,
+    color: colors.text.primary,
+    fontWeight: '700',
+    flexShrink: 1,
+    textAlign: 'right',
+    marginLeft: spacing.sm,
+  },
+  backButton: {
+    marginTop: spacing.xl,
+  },
 });
 
 export default Detalle;

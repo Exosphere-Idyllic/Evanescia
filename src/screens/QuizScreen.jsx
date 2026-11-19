@@ -1,16 +1,21 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React from 'react';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
+import { X, ArrowRight } from 'lucide-react-native';
 
 import { ALL_QUESTIONS } from '../data/questions';
 import { useQuiz } from '../hooks/useQuiz';
 import { getThemeGradient } from '../utils/theme';
-import ProgressBar from '../components/ProgressBar';
-import QuestionCard from '../components/QuestionCard';
-import OptionButton from '../components/OptionButton';
-import ResultsScreen from '../components/ResultsScreen';
-import GraceScreen from '../components/GraceScreen';
+import { ProgressBar } from '../components/ui/ProgressBar';
+import QuestionCard from '../components/quiz/QuestionCard';
+import OptionButton from '../components/quiz/OptionButton';
+import ResultsScreen from '../components/quiz/ResultsScreen';
+import GraceScreen from '../components/quiz/GraceScreen';
+import { IconButton } from '../components/ui/IconButton';
+import { Button } from '../components/ui/Button';
+import { spacing } from '../theme/spacing';
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D'];
 
@@ -80,16 +85,14 @@ export default function QuizScreen({ navigation }) {
     <LinearGradient colors={gradientColors} style={styles.container}>
       <StatusBar style="light" />
       <SafeAreaView style={styles.safeArea}>
-        {/* Barra superior: Botón salir y ProgressBar */}
+        {/* Barra superior: Botón salir con icono Lucide y ProgressBar */}
         <View style={styles.topBar}>
-          <TouchableOpacity
-            style={styles.exitButton}
+          <IconButton
+            icon={X}
             onPress={() => navigation.goBack()}
-            activeOpacity={0.7}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Text style={styles.exitButtonText}>✕</Text>
-          </TouchableOpacity>
+            size="sm"
+            variant="glass"
+          />
 
           <View style={styles.progressWrapper}>
             <ProgressBar current={currentIndex + 1} total={total} />
@@ -104,7 +107,7 @@ export default function QuizScreen({ navigation }) {
           {/* Tarjeta con el eje, dificultad y pregunta */}
           <QuestionCard question={current} />
 
-          {/* Opciones de respuesta */}
+          {/* Opciones de respuesta con feedback e iconos Lucide */}
           <View style={styles.optionsContainer}>
             {current?.options.map((option, idx) => (
               <OptionButton
@@ -119,17 +122,18 @@ export default function QuizScreen({ navigation }) {
             ))}
           </View>
 
-          {/* Botón opcional "Siguiente" para avanzar antes de que termine el delay */}
+          {/* Botón opcional "Siguiente" */}
           {isRevealed && (
-            <TouchableOpacity
-              style={styles.nextButton}
-              activeOpacity={0.8}
+            <Button
+              title={currentIndex + 1 === total ? 'Ver Resultados' : 'Siguiente'}
               onPress={next}
-            >
-              <Text style={styles.nextButtonText}>
-                {currentIndex + 1 === total ? 'Ver Resultados' : 'Siguiente'} →
-              </Text>
-            </TouchableOpacity>
+              variant="primary"
+              icon={ArrowRight}
+              iconPosition="right"
+              size="lg"
+              fullWidth
+              style={styles.nextButton}
+            />
           )}
         </ScrollView>
       </SafeAreaView>
@@ -147,54 +151,24 @@ const styles = StyleSheet.create({
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 4,
-    gap: 12,
-  },
-  exitButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
-  },
-  exitButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.xs,
+    gap: spacing.md,
   },
   progressWrapper: {
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 32,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xxxl,
     flexGrow: 1,
     justifyContent: 'space-between',
   },
   optionsContainer: {
-    marginVertical: 10,
+    marginVertical: spacing.sm,
   },
   nextButton: {
-    marginTop: 12,
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  nextButtonText: {
-    color: '#0f172a',
-    fontSize: 15,
-    fontWeight: '700',
-    letterSpacing: 0.3,
+    marginTop: spacing.md,
   },
 });

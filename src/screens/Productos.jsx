@@ -1,348 +1,258 @@
 import React, { useState, useEffect } from 'react';
 import {
-    View,
-    Text,
-    FlatList,
-    Image,
-    TouchableOpacity,
-    ActivityIndicator,
-    StyleSheet,
-    RefreshControl,
-    SafeAreaView,
+  View,
+  Text,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  RefreshControl,
 } from 'react-native';
+import { ShoppingBag, ChevronRight } from 'lucide-react-native';
+import { GradientBackground } from '../components/ui/GradientBackground';
+import { GlassCard } from '../components/ui/GlassCard';
+import { Badge } from '../components/ui/Badge';
+import { Rating } from '../components/ui/Rating';
+import { SectionHeader } from '../components/ui/SectionHeader';
+import { LoadingScreen } from '../components/ui/LoadingScreen';
+import { ErrorScreen } from '../components/ui/ErrorScreen';
+import { colors } from '../theme/colors';
+import { spacing, borderRadius } from '../theme/spacing';
+import { typography } from '../theme/typography';
+import { gradients } from '../theme/gradients';
 
 const API_URL = 'https://fakestoreapi.com/products';
 
 const Productos = ({ navigation }) => {
-    const [productos, setProductos] = useState([]);
-    const [cargando, setCargando] = useState(true);
-    const [error, setError] = useState(null);
-    const [refrescando, setRefrescando] = useState(false);
+  const [productos, setProductos] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
+  const [refrescando, setRefrescando] = useState(false);
 
-    useEffect(() => {
-        let activo = true;
-        fetch(API_URL)
-            .then((respuesta) => {
-                if (!respuesta.ok) {
-                    throw new Error(`Error en el servidor: ${respuesta.status}`);
-                }
-                return respuesta.json();
-            })
-            .then((datos) => {
-                if (activo) {
-                    setProductos(datos);
-                    setCargando(false);
-                }
-            })
-            .catch((err) => {
-                if (activo) {
-                    setError(err.message || 'No se pudieron cargar los productos');
-                    setCargando(false);
-                }
-            });
-
-        return () => {
-            activo = false;
-        };
-    }, []);
-
-    const refrescar = async () => {
-        setRefrescando(true);
-        setError(null);
-        try {
-            const respuesta = await fetch(API_URL);
-            if (!respuesta.ok) {
-                throw new Error(`Error en el servidor: ${respuesta.status}`);
-            }
-            const datos = await respuesta.json();
-            setProductos(datos);
-        } catch (err) {
-            setError(err.message || 'No se pudieron cargar los productos');
-        } finally {
-            setRefrescando(false);
-        }
-    };
-
-    const reintentar = async () => {
-        setCargando(true);
-        setError(null);
-        try {
-            const respuesta = await fetch(API_URL);
-            if (!respuesta.ok) {
-                throw new Error(`Error en el servidor: ${respuesta.status}`);
-            }
-            const datos = await respuesta.json();
-            setProductos(datos);
-        } catch (err) {
-            setError(err.message || 'No se pudieron cargar los productos');
-        } finally {
-            setCargando(false);
-        }
-    };
-
-    const irADetalle = (producto) => {
-        navigation.navigate('DetalleProducto', {
-            producto,
-            id: producto.id,
-        });
-    };
-
-    const renderItem = ({ item }) => (
-        <TouchableOpacity
-            style={styles.card}
-            activeOpacity={0.8}
-            onPress={() => irADetalle(item)}
-        >
-            <View style={styles.imageContainer}>
-                <Image
-                    source={{ uri: item.image }}
-                    style={styles.thumbnail}
-                    resizeMode="contain"
-                />
-            </View>
-
-            <View style={styles.infoContainer}>
-                <View style={styles.badgeCategoria}>
-                    <Text style={styles.badgeTexto} numberOfLines={1}>
-                        {item.category?.toUpperCase()}
-                    </Text>
-                </View>
-
-                <Text style={styles.titulo} numberOfLines={2}>
-                    {item.title}
-                </Text>
-
-                {item.rating && (
-                    <View style={styles.ratingRow}>
-                        <Text style={styles.ratingStar}>★</Text>
-                        <Text style={styles.ratingRate}>{item.rating.rate}</Text>
-                        <Text style={styles.ratingCount}>({item.rating.count})</Text>
-                    </View>
-                )}
-
-                <View style={styles.footerRow}>
-                    <Text style={styles.precio}>${Number(item.price).toFixed(2)}</Text>
-                    <View style={styles.verMasBtn}>
-                        <Text style={styles.verMasTexto}>Ver detalle →</Text>
-                    </View>
-                </View>
-            </View>
-        </TouchableOpacity>
-    );
-
-    if (cargando && !refrescando) {
-        return (
-            <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" color="#2563eb" />
-                <Text style={styles.mensajeCarga}>Cargando catálogo de productos...</Text>
-            </View>
-        );
+  const cargarProductos = async (esRefresco = false) => {
+    if (esRefresco) {
+      setRefrescando(true);
+    } else {
+      setCargando(true);
     }
+    setError(null);
 
-    if (error && productos.length === 0) {
-        return (
-            <View style={styles.centerContainer}>
-                <Text style={styles.errorIcono}>⚠️</Text>
-                <Text style={styles.errorTitulo}>Algo salió mal</Text>
-                <Text style={styles.errorMensaje}>{error}</Text>
-                <TouchableOpacity
-                    style={styles.reintentarBtn}
-                    onPress={reintentar}
-                >
-                    <Text style={styles.reintentarTexto}>Reintentar</Text>
-                </TouchableOpacity>
-            </View>
-        );
+    try {
+      const respuesta = await fetch(API_URL);
+      if (!respuesta.ok) {
+        throw new Error(`Error en el servidor: ${respuesta.status}`);
+      }
+      const datos = await respuesta.json();
+      setProductos(datos);
+    } catch (err) {
+      setError(err.message || 'No se pudieron cargar los productos');
+    } finally {
+      setCargando(false);
+      setRefrescando(false);
     }
+  };
 
-    return (
-        <SafeAreaView style={styles.container}>
-            <FlatList
-                data={productos}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={renderItem}
-                contentContainerStyle={styles.listContent}
-                showsVerticalScrollIndicator={false}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refrescando}
-                        onRefresh={refrescar}
-                        colors={['#2563eb']}
-                        tintColor="#2563eb"
-                    />
-                }
-                ListHeaderComponent={
-                    <View style={styles.header}>
-                        <Text style={styles.headerTitulo}>Explorar Productos</Text>
-                        <Text style={styles.headerSubtitulo}>
-                            Selecciona cualquier producto para ver especificaciones y comprar
-                        </Text>
-                    </View>
-                }
+  useEffect(() => {
+    let activo = true;
+
+    fetch(API_URL)
+      .then((respuesta) => {
+        if (!respuesta.ok) {
+          throw new Error(`Error en el servidor: ${respuesta.status}`);
+        }
+        return respuesta.json();
+      })
+      .then((datos) => {
+        if (activo) {
+          setProductos(datos);
+          setCargando(false);
+        }
+      })
+      .catch((err) => {
+        if (activo) {
+          setError(err.message || 'No se pudieron cargar los productos');
+          setCargando(false);
+        }
+      });
+
+    return () => {
+      activo = false;
+    };
+  }, []);
+
+  const irADetalle = (producto) => {
+    navigation.navigate('DetalleProducto', {
+      producto,
+      id: producto.id,
+    });
+  };
+
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      activeOpacity={0.85}
+      onPress={() => irADetalle(item)}
+      style={styles.touchableCard}
+    >
+      <GlassCard variant="default" style={styles.card}>
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: item.image }}
+            style={styles.thumbnail}
+            resizeMode="contain"
+          />
+        </View>
+
+        <View style={styles.infoContainer}>
+          <Badge
+            text={item.category}
+            variant="info"
+            size="sm"
+            style={styles.badge}
+          />
+
+          <Text style={styles.titulo} numberOfLines={2}>
+            {item.title}
+          </Text>
+
+          {item.rating && (
+            <Rating
+              rate={item.rating.rate}
+              count={item.rating.count}
+              size={13}
+              style={styles.rating}
             />
-        </SafeAreaView>
+          )}
+
+          <View style={styles.footerRow}>
+            <Text style={styles.precio}>${Number(item.price).toFixed(2)}</Text>
+            <View style={styles.verMasBtn}>
+              <Text style={styles.verMasTexto}>Detalles</Text>
+              <ChevronRight size={14} color={colors.accent.primaryLight} />
+            </View>
+          </View>
+        </View>
+      </GlassCard>
+    </TouchableOpacity>
+  );
+
+  if (cargando && !refrescando) {
+    return <LoadingScreen message="Cargando catálogo de productos..." />;
+  }
+
+  if (error && productos.length === 0) {
+    return (
+      <ErrorScreen
+        title="Catálogo no disponible"
+        message={error}
+        onRetry={() => cargarProductos(false)}
+      />
     );
+  }
+
+  return (
+    <GradientBackground colors={gradients.screenDefault} safe edges={['bottom', 'left', 'right']}>
+      <FlatList
+        data={productos}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refrescando}
+            onRefresh={() => cargarProductos(true)}
+            colors={[colors.accent.primary]}
+            tintColor={colors.accent.primary}
+          />
+        }
+        ListHeaderComponent={
+          <SectionHeader
+            title="Explorar Productos"
+            subtitle="Artículos seleccionados con diseño glassmorphism"
+            icon={ShoppingBag}
+            iconColor={colors.accent.primary}
+            style={styles.header}
+          />
+        }
+      />
+    </GradientBackground>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f8fafc',
-    },
-    listContent: {
-        padding: 16,
-        paddingBottom: 32,
-    },
-    header: {
-        marginBottom: 16,
-    },
-    headerTitulo: {
-        fontSize: 22,
-        fontWeight: '700',
-        color: '#0f172a',
-    },
-    headerSubtitulo: {
-        fontSize: 13,
-        color: '#64748b',
-        marginTop: 4,
-    },
-    card: {
-        backgroundColor: '#ffffff',
-        borderRadius: 16,
-        marginBottom: 16,
-        flexDirection: 'row',
-        padding: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 6,
-        elevation: 3,
-        borderWidth: 1,
-        borderColor: '#f1f5f9',
-    },
-    imageContainer: {
-        width: 105,
-        height: 125,
-        borderRadius: 12,
-        backgroundColor: '#ffffff',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 6,
-        borderWidth: 1,
-        borderColor: '#f1f5f9',
-    },
-    thumbnail: {
-        width: '100%',
-        height: '100%',
-    },
-    infoContainer: {
-        flex: 1,
-        marginLeft: 14,
-        justifyContent: 'space-between',
-    },
-    badgeCategoria: {
-        alignSelf: 'flex-start',
-        backgroundColor: '#eff6ff',
-        paddingHorizontal: 8,
-        paddingVertical: 3,
-        borderRadius: 6,
-        marginBottom: 4,
-    },
-    badgeTexto: {
-        fontSize: 10,
-        fontWeight: '700',
-        color: '#2563eb',
-        letterSpacing: 0.5,
-    },
-    titulo: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#1e293b',
-        lineHeight: 19,
-    },
-    ratingRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 4,
-    },
-    ratingStar: {
-        color: '#eab308',
-        fontSize: 13,
-        marginRight: 3,
-    },
-    ratingRate: {
-        fontSize: 12,
-        fontWeight: '700',
-        color: '#334155',
-    },
-    ratingCount: {
-        fontSize: 12,
-        color: '#94a3b8',
-        marginLeft: 4,
-    },
-    footerRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 8,
-    },
-    precio: {
-        fontSize: 17,
-        fontWeight: '800',
-        color: '#059669',
-    },
-    verMasBtn: {
-        backgroundColor: '#f8fafc',
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#e2e8f0',
-    },
-    verMasTexto: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: '#2563eb',
-    },
-    centerContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 24,
-        backgroundColor: '#f8fafc',
-    },
-    mensajeCarga: {
-        marginTop: 12,
-        fontSize: 14,
-        color: '#64748b',
-    },
-    errorIcono: {
-        fontSize: 40,
-        marginBottom: 12,
-    },
-    errorTitulo: {
-        fontSize: 18,
-        fontWeight: '700',
-        color: '#0f172a',
-        marginBottom: 6,
-    },
-    errorMensaje: {
-        fontSize: 14,
-        color: '#64748b',
-        textAlign: 'center',
-        marginBottom: 16,
-    },
-    reintentarBtn: {
-        backgroundColor: '#2563eb',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderRadius: 8,
-    },
-    reintentarTexto: {
-        color: '#ffffff',
-        fontWeight: '600',
-        fontSize: 14,
-    },
+  listContent: {
+    padding: spacing.lg,
+    paddingBottom: spacing.xxxl,
+  },
+  header: {
+    marginBottom: spacing.lg,
+    marginTop: spacing.xs,
+  },
+  touchableCard: {
+    marginBottom: spacing.md,
+  },
+  card: {
+    flexDirection: 'row',
+    padding: spacing.md,
+    alignItems: 'center',
+  },
+  imageContainer: {
+    width: 95,
+    height: 115,
+    borderRadius: borderRadius.md,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xs,
+  },
+  thumbnail: {
+    width: '100%',
+    height: '100%',
+  },
+  infoContainer: {
+    flex: 1,
+    marginLeft: spacing.lg,
+    justifyContent: 'space-between',
+  },
+  badge: {
+    marginBottom: spacing.xs,
+  },
+  titulo: {
+    ...typography.bodySmall,
+    fontWeight: '700',
+    color: colors.text.primary,
+    lineHeight: 18,
+    marginBottom: spacing.xs,
+  },
+  rating: {
+    marginBottom: spacing.xs,
+  },
+  footerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: spacing.xs,
+  },
+  precio: {
+    ...typography.h3,
+    color: colors.accent.success,
+    fontWeight: '900',
+  },
+  verMasBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: borderRadius.sm,
+    borderWidth: 1,
+    borderColor: colors.glass.borderLight,
+  },
+  verMasTexto: {
+    ...typography.caption,
+    color: colors.accent.primaryLight,
+    marginRight: 2,
+  },
 });
 
 export default Productos;
