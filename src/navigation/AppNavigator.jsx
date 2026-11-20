@@ -9,6 +9,8 @@ import Detalle from '../screens/Detalle';
 import QuizScreen from '../screens/QuizScreen';
 import Productos from '../screens/Productos';
 import DetalleProducto from '../screens/DetalleProducto';
+import Registro from '../screens/Registro';
+import SplashScreen from '../screens/SplashScreen';
 import { colors } from '../theme/colors';
 
 const Stack = createNativeStackNavigator();
@@ -16,7 +18,7 @@ const Stack = createNativeStackNavigator();
 const AppNavigator = () => {
   return (
     <Stack.Navigator
-      initialRouteName="Home"
+      initialRouteName="Splash"
       screenOptions={{
         headerStyle: {
           backgroundColor: colors.background.secondary,
@@ -33,6 +35,15 @@ const AppNavigator = () => {
         },
       }}
     >
+      <Stack.Screen
+        name="Splash"
+        component={SplashScreen}
+        options={{ 
+          headerShown: false,
+          animation: 'fade',
+          gestureEnabled: false,
+        }}
+      />
       <Stack.Screen
         name="Home"
         component={Home}
@@ -77,6 +88,11 @@ const AppNavigator = () => {
         name="DetalleProducto"
         component={DetalleProducto}
         options={{ title: 'Detalle del Producto' }}
+      />
+      <Stack.Screen
+        name="Registro"
+        component={Registro}
+        options={{ title: 'Registro' }}
       />
     </Stack.Navigator>
   );

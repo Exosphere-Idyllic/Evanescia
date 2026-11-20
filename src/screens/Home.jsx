@@ -7,6 +7,7 @@ import {
   ShoppingBag,
   Box,
   ChevronRight,
+  ClipboardList,
 } from 'lucide-react-native';
 import { GradientBackground } from '../components/ui/GradientBackground';
 import { GlassCard } from '../components/ui/GlassCard';
@@ -57,6 +58,14 @@ const MENU_ITEMS = [
     subtitle: 'Prueba de navegación a Home',
     icon: Box,
     color: colors.accent.primaryLight,
+  },
+  {
+    id: 'registro',
+    route: 'Registro',
+    title: 'Registro',
+    subtitle: 'Formulario con validación Formik + Yup',
+    icon: ClipboardList,
+    color: colors.accent.success,
   },
 ];
 
